@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+<!--    Strikethrough the General price if product has discount percentage-->
+    <template id="custom_price_view" inherit_id="website_sale.products_item">
+        <xpath expr="//div[hasclass('o_wsale_product_sub')]/div[hasclass('product_price')]" position="replace">
+            <div class="product_price" itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer">
+                <t t-if="template_price_vals.get('custom_percentage', 0) > 0">
+                    <span class="h6 mb-0"
+                          t-out="template_price_vals['custom_price']"
+                          t-options="{'widget': 'monetary', 'display_currency': website.currency_id}" />
+                    <del t-attf-class="text-muted me-1 h6 mb-0" style="white-space: nowrap;">
+                        <em class="small"
+                            t-esc="template_price_vals['price_reduce']"
+                            t-options="{'widget': 'monetary', 'display_currency': website.currency_id}" />
+                    </del>
+                </t>
+                <t t-else="">
+                    <span class="h6 mb-0"
+                          t-if="template_price_vals['price_reduce'] or not website.prevent_zero_price_sale"
+                          t-out="template_price_vals['price_reduce']"
+                          t-options="{'widget': 'monetary', 'display_currency': website.currency_id}" />
+                    <span class="h6 mb-0" t-elif="any(ptav.price_extra for ptav in product.attribute_line_ids.product_template_value_ids)">&amp;nbsp;</span>
+                    <span class="h6 mb-0" t-else="" t-field="website.prevent_zero_price_sale_text"/>
+                </t>
+                <span itemprop="price" style="display:none;" t-esc="template_price_vals['custom_price'] or template_price_vals['price_reduce']" />
+                <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name" />
+            </div>
+        </xpath>
+    </template>
+</odoo>
